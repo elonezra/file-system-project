@@ -9,10 +9,10 @@ endif
 all: main
 
 main: $(file).c
-	gcc $(CFLAGS) $(file).c -o main
+	gcc $(CFLAGS) $(file).c -o stree
 
 clean:
-	rm -f main
+	rm -f stree
 
 run: clean main
-	./main ../my_files/
+	./stree ../my_files/

@@ -50,7 +50,7 @@ char *permissions_to_unix_name(mode_t mode)
     static char result[11];
 
     // // The first character indicates the file type
-    // result[0] = S_ISDIR(mode) ? 'd' : '-';
+    result[0] = "";//S_ISDIR(mode) ? 'd' : '-';
 
     // The next nine characters indicate the permissions for user, group and others
     for (int i = 0; i < 3; i++)
@@ -62,7 +62,7 @@ char *permissions_to_unix_name(mode_t mode)
         char *perm_string = perm_strings[perm_bits];
         for (int j = 0; j < 3; j++)
         {
-            result[i * 3 + j + 1] = perm_string[j];
+            result[i * 3 + j ] = perm_string[j];
         }
     }
 
@@ -78,7 +78,6 @@ static int              /* Callback function called by ftw() */
 dirTree(const char *pathname, const struct stat *sbuf, int type, struct FTW *ftwb)
 {
     
-    //printf(" %*s", 4 * ftwb->level, " ");         /* Indent suitably */
     for (int i = 0; i < ftwb->level; i++)
     {
         if(i == 0)
@@ -101,21 +100,14 @@ dirTree(const char *pathname, const struct stat *sbuf, int type, struct FTW *ftw
         }
     }
 
-     // Print the file permissions in octal format
-    //printf("Permissions: %o\n", sbuf->st_mode & 0777);
-
 
     printf("%s", permissions_to_unix_name(sbuf->st_mode));
 
-    printf(" %s", get_file_group(&sbuf));
+    printf(" %s", get_file_group(sbuf));
     printf(" %s", get_file_user(sbuf));
 
     printf(" %ld", sbuf->st_size);
-    
-    /*if (type != FTW_NS)
-        printf("%7ld ", (long) sbuf->st_ino);
-    else
-        printf("        ");*/
+
 	
     printf("] ");
     printf("%s\n",  &pathname[ftwb->base]);     /* Print basename */
@@ -126,12 +118,8 @@ int
 main(int argc, char *argv[])
 {
     int flags = 0;
-    if (argc != 2) {
-        fprintf(stderr, "Usage: %s directory-path\n", argv[0]);
-        exit(EXIT_FAILURE);
-    }
    
-    if (nftw(argv[1], dirTree, 10, flags) == -1) {
+    if (nftw(".", dirTree, 10, flags) == -1) {
         perror("nftw");
         exit(EXIT_FAILURE);
     }
